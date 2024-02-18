@@ -12,7 +12,7 @@ public readonly record struct GetFormReponse(
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$t")]
 [JsonDerivedType(typeof(GetStringFormElement), "string")]
-[JsonDerivedType(typeof(GetNumericRangeFormElement), "nrange")]
+[JsonDerivedType(typeof(GetMultiChoiceElement), "mc")]
 public abstract record GetFormElement(
     long Id,
     string Title,
