@@ -15,6 +15,11 @@ namespace InForm.Server.Features.Forms;
 ///     access this functionality through the REST API implemented by this controller.
 /// </summary>
 /// <param name="dbContext">The database access object.</param>
+/// <param name="passwordHasher">The hasher utility for passwords.</param>
+/// <param name="formsService">
+///     The service whose services are published through the controller.
+/// </param>
+/// <param name="logger">The logger to use.</param>
 [Route("/api/forms")]
 [ApiController]
 [Consumes("application/json")]

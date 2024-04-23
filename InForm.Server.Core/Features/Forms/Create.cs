@@ -4,6 +4,19 @@ using System.Text.Json.Serialization;
 
 namespace InForm.Server.Core.Features.Forms;
 
+/// <summary>
+///     The DTO entity for creating a form.
+/// </summary>
+/// <param name="Title">The title of the whole form to be created.</param>
+/// <param name="Subtitle">
+///     The optional subtitle of the form to be created.
+/// </param>
+/// <param name="Password">
+///     An optional password to assign to the form. If not null, this is
+///     required to view the responses.
+/// </param>
+/// <param name="Elements">The list of elements to create the form with.</param>
+/// <seealso cref="CreateFormElement"/>
 public readonly record struct CreateFormRequest(
     [StringLength(64)]
     string Title,
@@ -15,6 +28,17 @@ public readonly record struct CreateFormRequest(
     List<CreateFormElement> Elements
 );
 
+/// <summary>
+///     The polymorphic base of the DTO entity for specifying the elements of a
+///     form during creation.
+/// </summary>
+/// <param name="Title">The title of the element to be created.</param>
+/// <param name="Subtitle">
+///     The optional subtitle of the element to be created.
+/// </param>
+/// <param name="Required">
+///     Whether this element is required when filling the form.
+/// </param>
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$t")]
 [JsonDerivedType(typeof(CreateStringElement), "string")]
 [JsonDerivedType(typeof(CreateMultiChoiceElement), "mc")]
@@ -24,12 +48,31 @@ public abstract record CreateFormElement(
     [StringLength(256)]
     string? Subtitle,
     bool Required
-) : IVisitable
-{
+) : IVisitable {
+    /// <inheritdoc />
     public abstract void Accept(IVisitor visitor);
+
+    /// <inheritdoc />
     public abstract TResult? Accept<TResult>(IVisitor<TResult> visitor) where TResult : notnull;
 }
 
+/// <summary>
+///     A DTO entity specifying the creation of a string element.
+/// </summary>
+/// <param name="Title">The title of the element to be created.</param>
+/// <param name="Subtitle">
+///     The optional subtitle of the element to be created.
+/// </param>
+/// <param name="Required">
+///     Whether this element is required when filling the form.
+/// </param>
+/// <param name="MaxLength">
+///     The maximum length of the string that can be input to this element.
+/// </param>
+/// <param name="Multiline">
+///     Whether this string entry element is to be rendered in a multi-line
+///     entry on the fill page.
+/// </param>
 public record CreateStringElement(
     [StringLength(128)]
     string Title,
@@ -39,21 +82,43 @@ public record CreateStringElement(
     int MaxLength,
     bool Required,
     bool Multiline
-) : CreateFormElement(Title, Subtitle, Required)
-{
+) : CreateFormElement(Title, Subtitle, Required) {
+    /// <inheritdoc />
     public override void Accept(IVisitor visitor)
     {
         if (visitor is not ITypedVisitor<CreateStringElement> typedVisitor) return;
         typedVisitor.Visit(this);
     }
 
+    /// <inheritdoc />
     public override TResult? Accept<TResult>(IVisitor<TResult> visitor) where TResult : default
     {
         if (visitor is not ITypedVisitor<CreateStringElement, TResult> typedVisitor) return default;
         return typedVisitor.Visit(this);
     }
-} 
+}
 
+/// <summary>
+///     A DTO entity specifying the creation of a numeric range element.
+/// </summary>
+/// <param name="Title">The title of the element to be created.</param>
+/// <param name="Subtitle">
+///     The optional subtitle of the element to be created.
+/// </param>
+/// <param name="Required">
+///     Whether this element is required when filling the form.
+/// </param>
+/// <param name="MinRange">
+///     The minimum value that can be selected in the numeric-range element for
+///     a given question.
+/// </param>
+/// <param name="MaxRange">
+///     The minimum value that can be selected in the numeric-range element for
+///     a given question.
+/// </param>
+/// <param name="Questions">
+///     The list of questions to be filled in the given range.
+/// </param>
 public record CreateNumericRangeElement(
     [StringLength(128)]
     string Title,
@@ -63,14 +128,15 @@ public record CreateNumericRangeElement(
     int MinRange,
     int MaxRange,
     List<string> Questions
-) : CreateFormElement(Title, Subtitle, Required)
-{
+) : CreateFormElement(Title, Subtitle, Required) {
+    /// <inheritdoc />
     public override void Accept(IVisitor visitor)
     {
         if (visitor is not ITypedVisitor<CreateNumericRangeElement> typedVisitor) return;
         typedVisitor.Visit(this);
     }
 
+    /// <inheritdoc />
     public override TResult? Accept<TResult>(IVisitor<TResult> visitor) where TResult : default
     {
         if (visitor is not ITypedVisitor<CreateNumericRangeElement, TResult> typedVisitor) return default;
@@ -78,6 +144,23 @@ public record CreateNumericRangeElement(
     }
 }
 
+/// <summary>
+///     A DTO entity specifying the creation of a multi-choice element.
+/// </summary>
+/// <param name="Title">The title of the element to be created.</param>
+/// <param name="Subtitle">
+///     The optional subtitle of the element to be created.
+/// </param>
+/// <param name="Required">
+///     Whether this element is required when filling the form.
+/// </param>
+/// <param name="Options">
+///     The list of elements to show on the element, to allow choosing from.
+/// </param>
+/// <param name="Selectable">
+///     The number of maximum options that can be selected on the element. Only
+///     a true multi-choice, if this is >1.
+/// </param>
 public record CreateMultiChoiceElement(
     string Title,
     string? Subtitle,
@@ -86,12 +169,14 @@ public record CreateMultiChoiceElement(
     int Selectable
 ) : CreateFormElement(Title, Subtitle, Required) {
 
+    /// <inheritdoc />
     public override void Accept(IVisitor visitor)
     {
         if (visitor is not ITypedVisitor<CreateMultiChoiceElement> typed) return;
         typed.Visit(this);
     }
 
+    /// <inheritdoc />
     public override TResult? Accept<TResult>(IVisitor<TResult> visitor)
         where TResult : default
     {

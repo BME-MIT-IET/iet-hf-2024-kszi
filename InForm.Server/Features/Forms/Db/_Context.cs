@@ -1,6 +1,4 @@
-using InForm.Server.Features.FillForms.Db;
 using InForm.Server.Features.Forms.Db;
-using InForm.Server.Migrations;
 using Microsoft.EntityFrameworkCore;
 
 namespace InForm.Server.Db;
@@ -62,11 +60,28 @@ public partial class InFormDbContext {
         => await source.Where(x => x.ParentFormId == form.Id).ToListAsync();
 
 #nullable disable
+    /// <summary>
+    ///     The db set for the form entities.
+    /// </summary>
     public DbSet<Form> Forms { get; set; }
 
+    /// <summary>
+    ///     The db set for the base form element entities.
+    /// </summary>
     public DbSet<FormElementBase> FormElementBases { get; set; }
 
+    /// <summary>
+    ///     The db set for the string form element entities.
+    /// </summary>
     public DbSet<StringFormElement> StringFormElements { get; set; }
+
+    /// <summary>
+    ///     The db set for the multi-choice form element entities.
+    /// </summary>
     public DbSet<MultiChoiceFormElement> MultiChoiceFormElements { get; set; }
+
+    /// <summary>
+    ///     The db set for the multi-choice option entities.
+    /// </summary>
     public DbSet<MultiChoiceOption> MultiChoiceOptions { get; set; }
 }

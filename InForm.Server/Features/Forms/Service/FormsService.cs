@@ -9,9 +9,7 @@ namespace InForm.Server.Features.Forms.Service;
 /// <summary>
 ///     The default implementation of the form service.
 /// </summary>
-public class FormsService(
-    IPasswordHasher passwordHasher
-) : IFormsService {
+public class FormsService : IFormsService {
     /// <inheritdoc />
     public async Task<Form> GetForm(
         InFormDbContext dbContext,
