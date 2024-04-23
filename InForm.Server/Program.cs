@@ -1,3 +1,4 @@
+using InForm.Server;
 using InForm.Server.Db;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -14,21 +15,30 @@ const string corsPolicy = "_inform_cors";
 
 builder.Services.AddCors(ops =>
 {
-	ops.AddPolicy(corsPolicy, policy =>
-	{
-		var origins = new List<string>();
-		config.GetSection("Cors:Origins").Bind(origins);
-		policy.WithOrigins([.. origins])
-			  .AllowAnyMethod()
-			  .AllowAnyHeader();
-	});
+    ops.AddPolicy(corsPolicy, policy =>
+    {
+        var cors = new CorsConfig();
+        config.GetSection("Cors").Bind(cors);
+        if (cors.Any)
+        {
+            policy.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        }
+        else
+        {
+            policy.WithOrigins(cors.Origins)
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        }
+    });
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(ops =>
 {
-	var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-	ops.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-	ops.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "InForm.Server.Core.xml"));
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    ops.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+    ops.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "InForm.Server.Core.xml"));
 });
 builder.Services.AddControllers();
 
@@ -38,7 +48,7 @@ builder.Services.AddSingleton<IPasswordHasher, SodiumPasswordHasher>();
 
 builder.Services.AddDbContext<InFormDbContext>(ops =>
 {
-	ops.UseNpgsql(config.GetConnectionString("InFormDb"));
+    ops.UseNpgsql(config.GetConnectionString("InFormDb"));
 });
 
 var app = builder.Build();
@@ -46,8 +56,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-	app.UseSwagger();
-	app.UseSwaggerUI();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
