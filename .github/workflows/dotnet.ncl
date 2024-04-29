@@ -20,7 +20,7 @@ let build-steps = [
   { name = "Checkout", uses = "actions/checkout@v4" },
   {
     name = "Setup dotnet",
-    uses = "actions/setup-dotnet@v3",
+    uses = "actions/setup-dotnet@v4",
     with = {
       dotnet-version = "8.0.204"
     }
@@ -38,8 +38,6 @@ let db-setup-steps = [
       name = "InForm.Migrations.tgz"
     }
   },
-  run_step "Install system packages" "apt update && apt install -y dnsutils",
-  run_step "dig test-db" "dig test-db",
   run_step "Apply migrations bundle" m%"
     tar xzf InForm.Migrations.tgz
     && ./InForm.Migrations
@@ -135,7 +133,7 @@ in
       ],
     load-tests = test_job
       [
-        run_step "Install system packages" "apt update && apt install -y python3.11 python3-pip",
+        run_step "Install system packages" "sudo apt update && sudo apt install -y python3.11 python3-pip",
         run_step "Setup python packages" "python3.11 -m pip install -r requirements.txt --break-system-packages",
         run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Server &",
         run_step "Do load tests" m%"
