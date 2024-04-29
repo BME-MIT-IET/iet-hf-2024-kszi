@@ -32,7 +32,10 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Install lsb-core system package
-      run: sudo apt install lsb-core
+      uses: awalsh128/cache-apt-pkgs-action@latest
+      with:
+        packages: lsb-core
+        version: '1.0'
     - name: Setup python3.11
       uses: actions/setup-python@v5
       with:
@@ -40,8 +43,12 @@ jobs:
         python-version: '3.11'
     - name: Install locust
       run: pip install -r requirements.txt
+    - name: Start server
+      run: dotnet run -c Release -v m --project InForm.Server &
     - name: Load tests
       run: locust --headless -f ci-utils/locustfile.py -H http://localhost:5218 -t 2m -u 3000 -r 100 --logfile obj/locust.log --csv api
+    - name: Stop server
+      run: pkill -INT dotnet
     - name: Parse load test results
       run: python3 ci-utils/parse-locust.py api_stats.csv > load-stats.md
     - if: always() && github.ref == 'refs/heads/main' && github.event_name == 'pull_request'

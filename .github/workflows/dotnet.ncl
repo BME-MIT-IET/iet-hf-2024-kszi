@@ -64,7 +64,11 @@ in
             [
               {
                 name = "Install lsb-core system package",
-                run = "sudo apt install lsb-core"
+                uses = "awalsh128/cache-apt-pkgs-action@latest",
+                with = {
+                    packages = "lsb-core",
+                    version = "1.0"
+                }
               },
               {
                 name = "Setup python3.11",
@@ -77,6 +81,10 @@ in
               {
                 name = "Install locust",
                 run = "pip install -r requirements.txt"
+              },
+              {
+                name = "Start server",
+                run = "dotnet run -c Release -v m --project InForm.Server &"
               },
               {
                 name = "Load tests",
@@ -92,6 +100,10 @@ in
                   --logfile obj/locust.log
                   --csv api
                 "%
+              },
+              {
+                name = "Stop server",
+                run = "pkill -INT dotnet"
               },
               {
                 name = "Parse load test results",
