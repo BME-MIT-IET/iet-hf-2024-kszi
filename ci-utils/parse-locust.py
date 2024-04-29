@@ -10,7 +10,7 @@ if lotus_out is None:
 
 print("# Load test results:\n")
 df = pd.read_csv(lotus_out).filter(items=["Type", "Name", "Request Count", "Median Response Time", "Average Response Time", "Max Response Time", "Requests/s", "90%", "95%", "99%"])
-print(df.to_markdown(tablefmt="github"))
+print(df.to_markdown(index=False, tablefmt="github"))
 
 aggr = df.tail(1)["Requests/s"].to_numpy()
 reqps = aggr[0]
