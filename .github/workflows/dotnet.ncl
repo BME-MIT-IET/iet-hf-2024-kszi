@@ -55,6 +55,7 @@ let postgres-test-db = {
   }
 }
 in
+let build-name = "build" in
 {
   name = "InForm CI",
   on = {
@@ -65,7 +66,7 @@ in
     DOTNET_ENVIRONMENT = "CI"
   },
   jobs = {
-    build =
+    "%{build-name}" =
       {
         steps =
           after_build
@@ -99,13 +100,13 @@ in
       & runner_env,
     tests =
       {
-        needs = ["build-check"],
+        needs = [build-name],
         steps = after_build [{ name = "Tests", run = "dotnet test --no-build --verbosity normal" }]
       }
       & runner_env,
     load-tests =
       {
-        needs = ["build-check"],
+        needs = [build-name],
         services = postgres-test-db,
         steps =
           after_build
