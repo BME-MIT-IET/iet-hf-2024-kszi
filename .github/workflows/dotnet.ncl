@@ -64,11 +64,7 @@ in
             [
               {
                 name = "Install lsb-release system package",
-                uses = "awalsh128/cache-apt-pkgs-action@latest",
-                with = {
-                    packages = "lsb-release",
-                    version = "1.0"
-                }
+                run = "apt update && apt install ldb-release"
               },
               {
                 name = "Setup python3.11",
