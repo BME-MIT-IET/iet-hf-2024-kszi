@@ -55,7 +55,7 @@ jobs:
     - name: Start InForm.Server
       run: dotnet run -c Release -v m --project InForm.Server &
     - name: Do load tests
-      run: locust --headless -f ci-utils/locustfile.py -H http://localhost:5218 -t 2m -u 3000 -r 100 --logfile obj/locust.log --csv api
+      run: locust --headless -f ci-utils/locustfile.py -H http://localhost:5218 -t 2m -u 3000 -r 100 --logfile locust.log --csv api
     - name: Stop server
       run: pkill -INT dotnet
     - name: Parse load test results
@@ -73,7 +73,7 @@ jobs:
         compression-level: 9
         name: locust.log
         overwrite: true
-        path: obj/locust.log
+        path: locust.log
   tests:
     container: bitnami/dotnet-sdk:8.0.204
     needs:

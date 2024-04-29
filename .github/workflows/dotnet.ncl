@@ -145,7 +145,7 @@ in
           -t 2m
           -u 3000
           -r 100
-          --logfile obj/locust.log
+          --logfile locust.log
           --csv api
         "%,
         run_step "Stop server" "pkill -INT dotnet",
@@ -174,7 +174,7 @@ in
           "if" = "failure()",
           with = {
             name = "locust.log",
-            path = "obj/locust.log",
+            path = "locust.log",
             compression-level = 9,
             overwrite = true,
           }
