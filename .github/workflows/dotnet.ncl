@@ -12,10 +12,29 @@ let build-steps = [
 ]
 in
 let fold_multiline = std.string.replace "\n" " " in
+let db-setup-steps = [
+  {
+    name = "Download migrations bundle",
+    uses = "actions/download-artifact@v4",
+    with = {
+      name = "InForm.Migrations.tgz"
+    }
+  },
+  {
+    name = "Apply migrations bundle",
+    run = fold_multiline
+      m%"
+      tar xzf InForm.Migrations.tgz
+      && ./InForm.Migrations
+    "%
+  }
+]
+in
 let after_build = fun steps =>
   std.array.flatten
     [
       build-steps,
+      db-setup-steps,
       steps
     ]
 in
@@ -46,8 +65,37 @@ in
     DOTNET_ENVIRONMENT = "CI"
   },
   jobs = {
-    build-check =
-      { steps = build-steps }
+    build =
+      {
+        steps =
+          after_build
+            [
+              {
+                name = "Restore dotnet tools",
+                run = "dotnet tool restore"
+              },
+              {
+                name = "Generate migration bundle",
+                run =
+                  fold_multiline
+                    m%"
+                  cd InForm.Server
+                  dotnet ef migrations bundle -o InForm.Migrations
+                  && tar czf ../mig.tar.gz InForm.Migrations appsettings.*.json
+                "%
+              },
+              {
+                name = "Upload bundle artifact",
+                uses = "actions/upload-artifact@v4",
+                with = {
+                  name = "InForm.Migrations.tgz",
+                  path = "mig.tar.gz",
+                  compression-level = 0, # already compressed
+                  overwrite = true,
+                }
+              }
+            ]
+      }
       & runner_env,
     tests =
       {

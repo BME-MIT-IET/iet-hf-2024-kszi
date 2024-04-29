@@ -1,7 +1,7 @@
 env:
   DOTNET_ENVIRONMENT: CI
 jobs:
-  build-check:
+  build:
     container: bitnami/dotnet-sdk:8.0.204
     runs-on:
     - ubuntu-latest
@@ -12,6 +12,23 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
+    - name: Download migrations bundle
+      uses: actions/download-artifact@v4
+      with:
+        name: InForm.Migrations.tgz
+    - name: Apply migrations bundle
+      run: tar xzf InForm.Migrations.tgz && ./InForm.Migrations
+    - name: Restore dotnet tools
+      run: dotnet tool restore
+    - name: Generate migration bundle
+      run: cd InForm.Server dotnet ef migrations bundle -o InForm.Migrations && tar czf ../mig.tar.gz InForm.Migrations appsettings.*.json
+    - name: Upload bundle artifact
+      uses: actions/upload-artifact@v4
+      with:
+        compression-level: 0
+        name: InForm.Migrations.tgz
+        overwrite: true
+        path: mig.tar.gz
   load-tests:
     container: bitnami/dotnet-sdk:8.0.204
     needs:
@@ -31,6 +48,12 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
+    - name: Download migrations bundle
+      uses: actions/download-artifact@v4
+      with:
+        name: InForm.Migrations.tgz
+    - name: Apply migrations bundle
+      run: tar xzf InForm.Migrations.tgz && ./InForm.Migrations
     - name: Install system packages
       run: apt update && apt install -y python3.11 python3-pip
     - name: Setup python packages
@@ -70,6 +93,12 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
+    - name: Download migrations bundle
+      uses: actions/download-artifact@v4
+      with:
+        name: InForm.Migrations.tgz
+    - name: Apply migrations bundle
+      run: tar xzf InForm.Migrations.tgz && ./InForm.Migrations
     - name: Tests
       run: dotnet test --no-build --verbosity normal
 name: InForm CI
