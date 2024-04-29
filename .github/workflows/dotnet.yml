@@ -48,12 +48,12 @@ jobs:
         name: InForm.Migrations.tgz
     - name: Apply migrations bundle
       run: tar xzf InForm.Migrations.tgz && ./InForm.Migrations
+    - name: Start InForm.Server
+      run: dotnet run -c Release -v m --project InForm.Server &
     - name: Install system packages
       run: apt update && apt install -y python3.11 python3-pip
     - name: Setup python packages
       run: python3.11 -m pip install -r requirements.txt --break-system-packages
-    - name: Start InForm.Server
-      run: dotnet run -c Release -v m --project InForm.Server &
     - name: Do load tests
       run: locust --headless -f ci-utils/locustfile.py -H http://localhost:5218 -t 2m -u 3000 -r 100 --logfile locust.log --csv api
     - name: Stop server

@@ -138,9 +138,9 @@ in
       ],
     load-tests = test_job
       [
+        run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Server &",
         run_step "Install system packages" "apt update && apt install -y python3.11 python3-pip",
         run_step "Setup python packages" "python3.11 -m pip install -r requirements.txt --break-system-packages",
-        run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Server &",
         run_step "Do load tests" m%"
           locust --headless
           -f ci-utils/locustfile.py
