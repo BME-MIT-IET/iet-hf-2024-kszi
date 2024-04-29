@@ -12,16 +12,10 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Download migrations bundle
-      uses: actions/download-artifact@v4
-      with:
-        name: InForm.Migrations.tgz
-    - name: Apply migrations bundle
-      run: tar xzf InForm.Migrations.tgz && ./InForm.Migrations
     - name: Restore dotnet tools
       run: dotnet tool restore
     - name: Generate migration bundle
-      run: cd InForm.Server dotnet ef migrations bundle -o InForm.Migrations && tar czf ../mig.tar.gz InForm.Migrations appsettings.*.json
+      run: cd InForm.Server && dotnet ef migrations bundle -o InForm.Migrations && tar czf ../mig.tar.gz InForm.Migrations appsettings.*.json
     - name: Upload bundle artifact
       uses: actions/upload-artifact@v4
       with:
@@ -35,12 +29,6 @@ jobs:
     - build
     runs-on:
     - ubuntu-latest
-    services:
-      test-db:
-        env:
-          POSTGRES_PASSWORD: postgres
-        image: postgres:16-alpine
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -58,9 +46,9 @@ jobs:
       run: apt update && apt install -y python3.11 python3-pip
     - name: Setup python packages
       run: python3.11 -m pip install -r requirements.txt --break-system-packages
-    - name: Start server
+    - name: Start InForm.Server
       run: dotnet run -c Release -v m --project InForm.Server &
-    - name: Load tests
+    - name: Do load tests
       run: locust --headless -f ci-utils/locustfile.py -H http://localhost:5218 -t 2m -u 3000 -r 100 --logfile obj/locust.log --csv api
     - name: Stop server
       run: pkill -INT dotnet
