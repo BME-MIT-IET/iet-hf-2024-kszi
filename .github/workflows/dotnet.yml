@@ -2,15 +2,12 @@ env:
   DOTNET_ENVIRONMENT: CI
 jobs:
   build:
+    container: bitnami/dotnet-sdk:8.0.204
     runs-on:
     - ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    - name: Setup dotnet
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.204
     - name: Restore
       run: dotnet restore
     - name: Build
@@ -27,17 +24,20 @@ jobs:
         overwrite: true
         path: InForm.Migrations.tgz
   load-tests:
+    container: bitnami/dotnet-sdk:8.0.204
     needs:
     - build
     runs-on:
     - ubuntu-latest
+    services:
+      test-db:
+        env:
+          POSTGRES_PASSWORD: postgres
+        image: postgres:16
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    - name: Setup dotnet
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.204
     - name: Restore
       run: dotnet restore
     - name: Build
@@ -49,7 +49,7 @@ jobs:
     - name: Apply migrations bundle
       run: tar xzf InForm.Migrations.tgz && ./InForm.Migrations
     - name: Install system packages
-      run: sudo apt update && sudo apt install -y python3.11 python3-pip
+      run: apt update && apt install -y python3.11 python3-pip
     - name: Setup python packages
       run: python3.11 -m pip install -r requirements.txt --break-system-packages
     - name: Start InForm.Server
@@ -75,17 +75,20 @@ jobs:
         overwrite: true
         path: obj/locust.log
   tests:
+    container: bitnami/dotnet-sdk:8.0.204
     needs:
     - build
     runs-on:
     - ubuntu-latest
+    services:
+      test-db:
+        env:
+          POSTGRES_PASSWORD: postgres
+        image: postgres:16
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    - name: Setup dotnet
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.204
     - name: Restore
       run: dotnet restore
     - name: Build

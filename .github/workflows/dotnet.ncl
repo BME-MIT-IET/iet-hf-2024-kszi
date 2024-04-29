@@ -3,7 +3,8 @@ let runners = ["ubuntu-latest"] in
 let dotnet_image = "bitnami/dotnet-sdk:8.0.204" in
 
 let runner_env = {
-  runs-on = runners
+  runs-on = runners,
+  container = dotnet_image,
 }
 in
 
@@ -18,13 +19,13 @@ in
 
 let build-steps = [
   { name = "Checkout", uses = "actions/checkout@v4" },
-  {
-    name = "Setup dotnet",
-    uses = "actions/setup-dotnet@v4",
-    with = {
-      dotnet-version = "8.0.204"
-    }
-  },
+  # {
+  #   name = "Setup dotnet",
+  #   uses = "actions/setup-dotnet@v4",
+  #   with = {
+  #     dotnet-version = "8.0.204"
+  #   }
+  # },
   run_step "Restore" "dotnet restore",
   run_step "Build" "dotnet build --no-restore",
 ]
@@ -68,7 +69,7 @@ let postgres-test-db = {
     env = {
       POSTGRES_PASSWORD = "postgres"
     },
-    ports = [ "5432:5432" ],
+#   ports = [ "5432:5432" ],
     options =
       fold_multiline
         m%"
@@ -86,6 +87,7 @@ let build-name = "build" in
 let test_job  = fun tsteps =>
   {
     needs = [build-name],
+    services = postgres-test-db,
     steps = test_steps tsteps
   }
   & runner_env
@@ -133,7 +135,7 @@ in
       ],
     load-tests = test_job
       [
-        run_step "Install system packages" "sudo apt update && sudo apt install -y python3.11 python3-pip",
+        run_step "Install system packages" "apt update && apt install -y python3.11 python3-pip",
         run_step "Setup python packages" "python3.11 -m pip install -r requirements.txt --break-system-packages",
         run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Server &",
         run_step "Do load tests" m%"
