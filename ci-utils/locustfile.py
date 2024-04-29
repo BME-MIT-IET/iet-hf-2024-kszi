@@ -75,7 +75,7 @@ class FormFillerUser(FastHttpUser):
                 resp.failure("missing id in response")
                 return
             elif resp.js["id"] != form_id:
-                resp.failure(f"mismatched id in response: {resp.js["id"]}")
+                resp.failure("mismatched id in response: {id}" % resp.js["id"])
                 return
 
             for e in resp.js["formElements"]:
@@ -87,7 +87,7 @@ class FormFillerUser(FastHttpUser):
             elif "id" not in resp.js:
                 resp.failure("missing id in response")
             elif resp.js["id"] != form_id:
-                resp.failure(f"mismatched id in response: {resp.js["id"]}")
+                resp.failure("mismatched id in response: {id}" % resp.js["id"])
 
     @task(1)
     def read_responses(self):
