@@ -15,14 +15,14 @@ jobs:
     - name: Restore dotnet tools
       run: dotnet tool restore
     - name: Generate migration bundle
-      run: cd InForm.Server && dotnet ef migrations bundle -o InForm.Migrations && tar czf ../mig.tar.gz InForm.Migrations appsettings.*.json
+      run: cd InForm.Server && dotnet ef migrations bundle -o InForm.Migrations && tar czf ../InForm.Migrations.tgz InForm.Migrations appsettings.*.json
     - name: Upload bundle artifact
       uses: actions/upload-artifact@v4
       with:
         compression-level: 0
         name: InForm.Migrations.tgz
         overwrite: true
-        path: mig.tar.gz
+        path: InForm.Migrations.tgz
   load-tests:
     container: bitnami/dotnet-sdk:8.0.204
     needs:

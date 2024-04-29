@@ -106,14 +106,14 @@ in
                 m%"
                 cd InForm.Server
                 && dotnet ef migrations bundle -o InForm.Migrations
-                && tar czf ../mig.tar.gz InForm.Migrations appsettings.*.json
+                && tar czf ../InForm.Migrations.tgz InForm.Migrations appsettings.*.json
               "%,
               {
                 name = "Upload bundle artifact",
                 uses = "actions/upload-artifact@v4",
                 with = {
                   name = "InForm.Migrations.tgz",
-                  path = "mig.tar.gz",
+                  path = "InForm.Migrations.tgz",
                   compression-level = 0, # already compressed
                   overwrite = true,
                 }
