@@ -108,7 +108,10 @@ in
         steps =
           after_build
             [
-              run_step "Restore dotnet tools" "dotnet tool restore",
+              run_step "Restore dotnet tools" m%"
+                cd InForm.Server
+                && dotnet tool restore
+              "%,
               run_step
                 "Generate migration bundle"
                 m%"

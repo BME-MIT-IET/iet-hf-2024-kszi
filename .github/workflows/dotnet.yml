@@ -13,7 +13,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Restore dotnet tools
-      run: dotnet tool restore
+      run: cd InForm.Server && dotnet tool restore
     - name: Generate migration bundle
       run: cd InForm.Server && dotnet ef migrations bundle -o InForm.Migrations && tar czf ../InForm.Migrations.tgz InForm.Migrations appsettings.*.json
     - name: Upload bundle artifact
