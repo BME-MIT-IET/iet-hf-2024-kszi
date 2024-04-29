@@ -32,7 +32,8 @@ let db-setup-steps = [
       name = "InForm.Migrations.tgz"
     }
   },
-  run_step "Debug find" "find / -type f -name '*.tgz'",
+  run_step "Dig test-db" "dig test-db || 0",
+  run_step "nsl test-db" "nslookup test-db || 0",
   run_step "Apply migrations bundle" m%"
     tar xzf InForm.Migrations.tgz
     && ./InForm.Migrations
@@ -59,7 +60,7 @@ in
 
 let postgres-test-db = {
   test-db = {
-    image = "postgres:16-alpine",
+    image = "postgres:16",
     env = {
       POSTGRES_PASSWORD = "postgres"
     },

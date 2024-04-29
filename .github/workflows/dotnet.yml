@@ -40,8 +40,10 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: InForm.Migrations.tgz
-    - name: Debug find
-      run: find / -type f -name '*.tgz'
+    - name: Dig test-db
+      run: dig test-db || 0
+    - name: nsl test-db
+      run: nslookup test-db || 0
     - name: Apply migrations bundle
       run: tar xzf InForm.Migrations.tgz && ./InForm.Migrations
     - name: Install system packages
@@ -87,8 +89,10 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: InForm.Migrations.tgz
-    - name: Debug find
-      run: find / -type f -name '*.tgz'
+    - name: Dig test-db
+      run: dig test-db || 0
+    - name: nsl test-db
+      run: nslookup test-db || 0
     - name: Apply migrations bundle
       run: tar xzf InForm.Migrations.tgz && ./InForm.Migrations
     - name: Tests
