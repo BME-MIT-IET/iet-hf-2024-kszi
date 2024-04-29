@@ -1,28 +1,80 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET
-
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
+env:
+  DOTNET_ENVIRONMENT: CI
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
+  build-check:
+    container: bitnami/dotnet-sdk:8.0.204
+    runs-on:
+    - ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Restore dependencies
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Restore
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Test
+  load-tests:
+    container: bitnami/dotnet-sdk:8.0.204
+    needs:
+    - build-check
+    runs-on:
+    - ubuntu-latest
+    services:
+      test-db:
+        env:
+          POSTGRES_PASSWORD: postgres
+        image: postgres:16-alpine
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Restore
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - uses: actions/setup-python@v5
+      with:
+        cache: pip
+        python-version: '3.12'
+    - name: Install locust
+      run: pip install -r requirements.txt
+    - name: Load tests
+      run: locust --headless -f ci-utils/locustfile.py -H http://localhost:5218 -t 2m -u 3000 -r 100 --logfile obj/locust.log --csv api
+    - name: Parse load test results
+      run: python3 ci-utils/parse-locust.py api_stats.csv > load-stats.md
+    - if: always() && github.ref == 'refs/heads/main' && github.event_name == 'pull_request'
+      name: Comment statistics to PR
+      uses: thollander/actions-comment-pull-request@v2
+      with:
+        comment_tag: load-statistics-table
+        filePath: load-stats.md
+    - if: failure()
+      name: Upload locust logs to artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        compression-level: 9
+        name: locust.log
+        overwrite: true
+        path: obj/locust.log
+  tests:
+    container: bitnami/dotnet-sdk:8.0.204
+    needs:
+    - build-check
+    runs-on:
+    - ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Restore
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Tests
       run: dotnet test --no-build --verbosity normal
+name: InForm CI
+on:
+  pull_request:
+    branches:
+    - main
+  push:
+    branches:
+    - main
