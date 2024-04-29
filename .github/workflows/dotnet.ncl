@@ -63,10 +63,10 @@ in
           after_build
             [
               {
-                name = "Install lsb-core system package",
+                name = "Install lsb-release system package",
                 uses = "awalsh128/cache-apt-pkgs-action@latest",
                 with = {
-                    packages = "lsb-core",
+                    packages = "lsb-release",
                     version = "1.0"
                 }
               },
