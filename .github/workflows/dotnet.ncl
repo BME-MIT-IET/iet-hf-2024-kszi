@@ -32,8 +32,7 @@ let db-setup-steps = [
       name = "InForm.Migrations.tgz"
     }
   },
-  run_step "Dig test-db" "dig test-db || 0",
-  run_step "nsl test-db" "nslookup test-db || 0",
+  run_step "dig test-db" "dig test-db",
   run_step "Apply migrations bundle" m%"
     tar xzf InForm.Migrations.tgz
     && ./InForm.Migrations
@@ -128,7 +127,7 @@ in
       ],
     load-tests = test_job
       [
-        run_step "Install system packages" "apt update && apt install -y python3.11 python3-pip",
+        run_step "Install system packages" "apt update && apt install -y python3.11 python3-pip dnsutils",
         run_step "Setup python packages" "python3.11 -m pip install -r requirements.txt --break-system-packages",
         run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Server &",
         run_step "Do load tests" m%"

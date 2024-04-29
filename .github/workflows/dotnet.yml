@@ -40,14 +40,12 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: InForm.Migrations.tgz
-    - name: Dig test-db
-      run: dig test-db || 0
-    - name: nsl test-db
-      run: nslookup test-db || 0
+    - name: dig test-db
+      run: dig test-db
     - name: Apply migrations bundle
       run: tar xzf InForm.Migrations.tgz && ./InForm.Migrations
     - name: Install system packages
-      run: apt update && apt install -y python3.11 python3-pip
+      run: apt update && apt install -y python3.11 python3-pip dnsutils
     - name: Setup python packages
       run: python3.11 -m pip install -r requirements.txt --break-system-packages
     - name: Start InForm.Server
@@ -89,10 +87,8 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: InForm.Migrations.tgz
-    - name: Dig test-db
-      run: dig test-db || 0
-    - name: nsl test-db
-      run: nslookup test-db || 0
+    - name: dig test-db
+      run: dig test-db
     - name: Apply migrations bundle
       run: tar xzf InForm.Migrations.tgz && ./InForm.Migrations
     - name: Tests
