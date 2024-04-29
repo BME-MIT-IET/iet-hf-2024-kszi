@@ -63,9 +63,14 @@ in
           after_build
             [
               {
+                name = "Install lsb-core system package",
+                run = "sudo apt install lsb-core"
+              },
+              {
+                name = "Setup python3.11",
                 uses = "actions/setup-python@v5",
                 with = {
-                  python-version = "3.12",
+                  python-version = "3.11",
                   cache = "pip"
                 }
               },

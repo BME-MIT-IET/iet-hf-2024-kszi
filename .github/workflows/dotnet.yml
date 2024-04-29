@@ -31,10 +31,13 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - uses: actions/setup-python@v5
+    - name: Install lsb-core system package
+      run: sudo apt install lsb-core
+    - name: Setup python3.11
+      uses: actions/setup-python@v5
       with:
         cache: pip
-        python-version: '3.12'
+        python-version: '3.11'
     - name: Install locust
       run: pip install -r requirements.txt
     - name: Load tests
