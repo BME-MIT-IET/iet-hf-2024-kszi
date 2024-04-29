@@ -64,7 +64,7 @@ in
             [
               {
                 name = "Install lsb-release system package",
-                run = "apt update && apt install ldb-release"
+                run = "apt update && apt install -y lsb-release"
               },
               {
                 name = "Setup python3.11",
