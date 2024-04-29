@@ -3,8 +3,7 @@ let runners = ["ubuntu-latest"] in
 let dotnet_image = "bitnami/dotnet-sdk:8.0.204" in
 
 let runner_env = {
-  runs-on = runners,
-  container = dotnet_image
+  runs-on = runners
 }
 in
 
@@ -17,8 +16,15 @@ let run_step : String -> String -> { _: String } = fun step_name cmd =>
   }
 in
 
-let build-steps : Array { _: String } = [
-  { name = "Checkout", uses = "actions/checkout@v4" } : { _: String },
+let build-steps = [
+  { name = "Checkout", uses = "actions/checkout@v4" },
+  {
+    name = "Setup dotnet",
+    uses = "actions/setup-dotnet@v3",
+    with = {
+      dotnet-version = "8.0.204"
+    }
+  },
   run_step "Restore" "dotnet restore",
   run_step "Build" "dotnet build --no-restore",
 ]
@@ -64,6 +70,7 @@ let postgres-test-db = {
     env = {
       POSTGRES_PASSWORD = "postgres"
     },
+    ports = [ "5432:5432" ],
     options =
       fold_multiline
         m%"

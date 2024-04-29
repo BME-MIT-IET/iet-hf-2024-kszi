@@ -2,12 +2,15 @@ env:
   DOTNET_ENVIRONMENT: CI
 jobs:
   build:
-    container: bitnami/dotnet-sdk:8.0.204
     runs-on:
     - ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.204
     - name: Restore
       run: dotnet restore
     - name: Build
@@ -24,7 +27,6 @@ jobs:
         overwrite: true
         path: InForm.Migrations.tgz
   load-tests:
-    container: bitnami/dotnet-sdk:8.0.204
     needs:
     - build
     runs-on:
@@ -32,6 +34,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.204
     - name: Restore
       run: dotnet restore
     - name: Build
@@ -73,7 +79,6 @@ jobs:
         overwrite: true
         path: obj/locust.log
   tests:
-    container: bitnami/dotnet-sdk:8.0.204
     needs:
     - build
     runs-on:
@@ -81,6 +86,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.204
     - name: Restore
       run: dotnet restore
     - name: Build
