@@ -61,8 +61,9 @@ class FormFillerUser(FastHttpUser):
 
     def on_start(self):
         with self.rest('POST', f'/api/forms', json=setup_data) as resp:
-            new_id = resp.js["id"]
-            test_form_ids.append(new_id)
+            if resp.js is not None:
+                new_id = resp.js["id"]
+                test_form_ids.append(new_id)
 
     @task(20)
     def fill_form(self):
