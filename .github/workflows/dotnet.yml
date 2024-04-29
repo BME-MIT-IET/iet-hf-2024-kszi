@@ -60,7 +60,7 @@ jobs:
       run: pkill -INT dotnet
     - name: Parse load test results
       run: python3.11 ci-utils/parse-locust.py api_stats.csv > load-stats.md
-    - if: always() && github.ref == 'refs/heads/main' && github.event_name == 'pull_request'
+    - if: always() && github.event_name == 'pull_request'
       name: Comment statistics to PR
       uses: thollander/actions-comment-pull-request@v2
       with:

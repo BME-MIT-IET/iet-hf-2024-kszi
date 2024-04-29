@@ -163,7 +163,6 @@ in
             fold_multiline
               m%"
             always()
-            && github.ref == 'refs/heads/main'
             && github.event_name == 'pull_request'
           "%,
           with = {
