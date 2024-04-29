@@ -63,20 +63,12 @@ in
           after_build
             [
               {
-                name = "Install lsb-release system package",
-                run = "apt update && apt install -y lsb-release"
+                name = "Install system packages",
+                run = "apt update && apt install -y python3.11 python3-pip"
               },
               {
-                name = "Setup python3.11",
-                uses = "actions/setup-python@v5",
-                with = {
-                  python-version = "3.11",
-                  cache = "pip"
-                }
-              },
-              {
-                name = "Install locust",
-                run = "pip install -r requirements.txt"
+                name = "Setup python packages",
+                run = "python3.11 -m pip install -r requirements.txt --break-system-packages"
               },
               {
                 name = "Start server",
@@ -106,7 +98,7 @@ in
                 run =
                   fold_multiline
                     m%"
-                  python3 ci-utils/parse-locust.py
+                  python3.11 ci-utils/parse-locust.py
                   api_stats.csv > load-stats.md
                 "%
               },
