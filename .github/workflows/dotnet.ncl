@@ -32,6 +32,7 @@ let db-setup-steps = [
       name = "InForm.Migrations.tgz"
     }
   },
+  run_step "Debug find" "find / -type f -name '*.tgz'",
   run_step "Apply migrations bundle" m%"
     tar xzf InForm.Migrations.tgz
     && ./InForm.Migrations
