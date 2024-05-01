@@ -82,16 +82,7 @@ let postgres-test-db = {
 in
 
 let dependency_list_step = fun type =>
-    run_step "List %{type} dependencies" m%"
-      dotnet list package --%{type} --format json --output-version 1 
-      | jq '(.projects | map({ 
-          proj: (.path | sub(".+?(?<p>[^/\\\\]+).csproj$"; "\n\n### \(.p)\n")), 
-          deps: (.frameworks[]? | "#### \(.framework):\n" + (reduce 
-            (.topLevelPackages | map("\(.id): \(.requestedVersion) -> \(.latestVersion)"))[] as $dep 
-            (""; "\(.)\n - \($dep)"))) 
-        }))' 
-      > %{type}.json
-    "%
+  run_step "List %{type} dependencies" "sh ci-utils/list-pkg.sh %{type}"
 in
 
 let build-name = "build" in
@@ -151,7 +142,7 @@ in
     zap-test = test_job
       [
         run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Server &",
-        run_step "Install system packages" "apt update && apt install -y openjdk-17 curl",
+        run_step "Install system packages" "apt update && apt install -y openjdk-17-jdk curl",
         run_step "Install ZAP" m%"
           curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2.14.0_Linux.tar.gz | tar xz 
         "%,

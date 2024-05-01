@@ -84,11 +84,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: List vulnerable dependencies
-      run: 'dotnet list package --vulnerable --format json --output-version 1  | jq ''(.projects | map({      proj: (.path | sub(".+?(?<p>[^/\\\\]+).csproj$"; "\n\n### \(.p)\n")),      deps: (.frameworks[]? | "#### \(.framework):\n" + (reduce        (.topLevelPackages | map("\(.id): \(.requestedVersion) -> \(.latestVersion)"))[] as $dep        (""; "\(.)\n - \($dep)")))    }))''  > vulnerable.json'
+      run: sh ci-utils/list-pkg.sh vulnerable
     - name: List outdated dependencies
-      run: 'dotnet list package --outdated --format json --output-version 1  | jq ''(.projects | map({      proj: (.path | sub(".+?(?<p>[^/\\\\]+).csproj$"; "\n\n### \(.p)\n")),      deps: (.frameworks[]? | "#### \(.framework):\n" + (reduce        (.topLevelPackages | map("\(.id): \(.requestedVersion) -> \(.latestVersion)"))[] as $dep        (""; "\(.)\n - \($dep)")))    }))''  > outdated.json'
+      run: sh ci-utils/list-pkg.sh outdated
     - name: List deprecated dependencies
-      run: 'dotnet list package --deprecated --format json --output-version 1  | jq ''(.projects | map({      proj: (.path | sub(".+?(?<p>[^/\\\\]+).csproj$"; "\n\n### \(.p)\n")),      deps: (.frameworks[]? | "#### \(.framework):\n" + (reduce        (.topLevelPackages | map("\(.id): \(.requestedVersion) -> \(.latestVersion)"))[] as $dep        (""; "\(.)\n - \($dep)")))    }))''  > deprecated.json'
+      run: sh ci-utils/list-pkg.sh deprecated
     - name: Fromat depdendency report
       run: python3 ci-utils/parse-pkgs.py vulnerable.json outdated.json deprecated.json
     - if: always() && github.event_name == 'pull_request'
@@ -152,7 +152,7 @@ jobs:
     - name: Start InForm.Server
       run: dotnet run -c Release -v m --project InForm.Server &
     - name: Install system packages
-      run: apt update && apt install -y openjdk-17 curl
+      run: apt update && apt install -y openjdk-17-jdk curl
     - name: Install ZAP
       run: 'curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2.14.0_Linux.tar.gz | tar xz '
     - name: ''
