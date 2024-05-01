@@ -69,7 +69,6 @@ let postgres-test-db = {
     env = {
       POSTGRES_PASSWORD = "postgres"
     },
-#   ports = [ "5432:5432" ],
     options =
       fold_multiline
         m%"
@@ -80,6 +79,19 @@ let postgres-test-db = {
     "%
   }
 }
+in
+
+let dependency_list_step = fun type =>
+    run_step "List %{type} dependencies" m%"
+      dotnet list package --%{type} --format json --output-version 1 
+      | jq '(.projects | map({ 
+          proj: (.path | sub(".+?(?<p>[^/\\\\]+).csproj$"; "\n\n### \(.p)\n")), 
+          deps: (.frameworks[]? | "#### \(.framework):\n" + (reduce 
+            (.topLevelPackages | map("\(.id): \(.requestedVersion) -> \(.latestVersion)"))[] as $dep 
+            (""; "\(.)\n - \($dep)"))) 
+        }))' 
+      > %{type}.json
+    "%
 in
 
 let build-name = "build" in
@@ -136,6 +148,57 @@ in
       [
         run_step "Tests" "dotnet test --no-build --verbosity normal"
       ],
+    zap-test = test_job 
+      [
+        run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Server &",
+        {
+          name = "ZAP",
+          uses = "zaproxy/action-af@v0.1.0",
+          with = {
+            plan = "ci-utils/zap.yaml"
+          }
+        },
+        run_step "Stop server" "pkill -INT dotnet",
+        {
+          name = "Comment statistics to PR",
+          uses = "thollander/actions-comment-pull-request@v2",
+          "if" =
+            fold_multiline
+              m%"
+            always()
+            && github.event_name == 'pull_request'
+          "%,
+          with = {
+            filePath = "zap-report.md",
+            comment_tag = "zap-report"
+          }
+        },
+      ],
+    packages-test = 
+      {
+        steps = [
+          { name = "Checkout", uses = "actions/checkout@v4" },
+          dependency_list_step "vulnerable",
+          dependency_list_step "outdated",
+          dependency_list_step "deprecated",
+          run_step "Fromat depdendency report" "python3 ci-utils/parse-pkgs.py vulnerable.json outdated.json deprecated.json",
+          {
+            name = "Comment statistics to PR",
+            uses = "thollander/actions-comment-pull-request@v2",
+            "if" =
+              fold_multiline
+                m%"
+              always()
+              && github.event_name == 'pull_request'
+            "%,
+            with = {
+              filePath = "dotnet-pkgs.md",
+              comment_tag = "dotnet-pkgs-report"
+            }
+          },
+        ]
+      } 
+      & runner_env,
     load-tests = test_job
       [
         run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Server &",

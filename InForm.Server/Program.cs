@@ -54,7 +54,7 @@ builder.Services.AddDbContext<InFormDbContext>(ops =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("CI"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
