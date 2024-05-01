@@ -83,6 +83,8 @@ jobs:
       run: apt update && apt install -y jq python3.11
     - name: Checkout
       uses: actions/checkout@v4
+    - name: Restore
+      run: dotnet restore
     - name: List vulnerable dependencies
       run: sh ci-utils/list-pkg.sh vulnerable
     - name: List outdated dependencies

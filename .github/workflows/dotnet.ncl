@@ -172,6 +172,7 @@ in
         steps = [
           run_step "Install system packages" "apt update && apt install -y jq python3.11",
           { name = "Checkout", uses = "actions/checkout@v4" },
+          run_step "Restore" "dotnet restore",
           dependency_list_step "vulnerable",
           dependency_list_step "outdated",
           dependency_list_step "deprecated",
