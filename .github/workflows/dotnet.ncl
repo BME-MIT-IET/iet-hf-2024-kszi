@@ -177,6 +177,7 @@ in
     packages-test = 
       {
         steps = [
+          run_step "Install system packages" "apt update && apt install -y jq",
           { name = "Checkout", uses = "actions/checkout@v4" },
           dependency_list_step "vulnerable",
           dependency_list_step "outdated",

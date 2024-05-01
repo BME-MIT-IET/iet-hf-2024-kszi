@@ -79,6 +79,8 @@ jobs:
     runs-on:
     - ubuntu-latest
     steps:
+    - name: Install system packages
+      run: apt update && apt install -y jq
     - name: Checkout
       uses: actions/checkout@v4
     - name: List vulnerable dependencies
