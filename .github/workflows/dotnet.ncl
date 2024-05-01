@@ -143,7 +143,7 @@ in
       [
         run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Server -lp ci &",
         run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Web -lp ci &",
-        run_step "Install system packages" "apt update && apt install -y openjdk-17-jdk curl",
+        run_step "Install system packages" "apt update && apt install -y openjdk-17-jdk curl firefox-esr chromium",
         run_step "Install ZAP" m%"
           curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2.14.0_Linux.tar.gz | tar xz 
         "%,

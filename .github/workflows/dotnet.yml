@@ -154,7 +154,7 @@ jobs:
     - name: Start InForm.Server
       run: dotnet run -c Release -v m --project InForm.Web -lp ci &
     - name: Install system packages
-      run: apt update && apt install -y openjdk-17-jdk curl
+      run: apt update && apt install -y openjdk-17-jdk curl firefox-esr chromium
     - name: Install ZAP
       run: 'curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2.14.0_Linux.tar.gz | tar xz '
     - name: ''
