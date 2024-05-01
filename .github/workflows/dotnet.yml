@@ -55,7 +55,7 @@ jobs:
     - name: Setup python packages
       run: python3.11 -m pip install -r requirements.txt --break-system-packages
     - name: Do load tests
-      run: locust --headless -f ci-utils/locustfile.py -H http://localhost:5218 -t 2m -u 3000 -r 100 --logfile locust.log --csv api
+      run: locust --headless -f ci-utils/locustfile.py -H http://localhost:9000 -t 2m -u 3000 -r 100 --logfile locust.log --csv api
     - name: Stop server
       run: pkill -INT dotnet
     - name: Parse load test results

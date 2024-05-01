@@ -200,7 +200,7 @@ in
         run_step "Do load tests" m%"
           locust --headless
           -f ci-utils/locustfile.py
-          -H http://localhost:5218
+          -H http://localhost:9000
           -t 2m
           -u 3000
           -r 100
