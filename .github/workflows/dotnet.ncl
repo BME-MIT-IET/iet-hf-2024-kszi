@@ -170,12 +170,12 @@ in
     packages-test = 
       {
         steps = [
-          run_step "Install system packages" "apt update && apt install -y jq",
+          run_step "Install system packages" "apt update && apt install -y jq python3.11",
           { name = "Checkout", uses = "actions/checkout@v4" },
           dependency_list_step "vulnerable",
           dependency_list_step "outdated",
           dependency_list_step "deprecated",
-          run_step "Fromat depdendency report" "python3 ci-utils/parse-pkgs.py vulnerable.json outdated.json deprecated.json",
+          run_step "Fromat depdendency report" "python3.11 ci-utils/parse-pkgs.py vulnerable.json outdated.json deprecated.json",
           {
             name = "Comment statistics to PR",
             uses = "thollander/actions-comment-pull-request@v2",

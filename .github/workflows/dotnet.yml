@@ -80,7 +80,7 @@ jobs:
     - ubuntu-latest
     steps:
     - name: Install system packages
-      run: apt update && apt install -y jq
+      run: apt update && apt install -y jq python3.11
     - name: Checkout
       uses: actions/checkout@v4
     - name: List vulnerable dependencies
@@ -90,7 +90,7 @@ jobs:
     - name: List deprecated dependencies
       run: sh ci-utils/list-pkg.sh deprecated
     - name: Fromat depdendency report
-      run: python3 ci-utils/parse-pkgs.py vulnerable.json outdated.json deprecated.json
+      run: python3.11 ci-utils/parse-pkgs.py vulnerable.json outdated.json deprecated.json
     - if: always() && github.event_name == 'pull_request'
       name: Comment statistics to PR
       uses: thollander/actions-comment-pull-request@v2
