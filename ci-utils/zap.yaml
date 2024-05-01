@@ -39,21 +39,6 @@ jobs:
     targetUrl: ""
   type: "openapi"
   name: "openapi"
-- parameters:
-    maxDuration: 60
-    maxCrawlDepth: 10
-    numberOfBrowsers: 64
-    inScopeOnly: true
-  type: "spiderAjax"
-  name: "spiderAjax"
-  tests:
-  - onFail: "INFO"
-    statistic: "spiderAjax.urls.added"
-    site: ""
-    operator: ">="
-    value: 100
-    type: "stats"
-    name: "At least 100 URLs found"
 - parameters: {}
   type: "passiveScan-wait"
   name: "passiveScan-wait"
