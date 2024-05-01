@@ -49,7 +49,7 @@ jobs:
     - name: Apply migrations bundle
       run: tar xzf InForm.Migrations.tgz && ./InForm.Migrations
     - name: Start InForm.Server
-      run: dotnet run -c Release -v m --project InForm.Server &
+      run: dotnet run -c Release -v m --project InForm.Server -lp ci &
     - name: Install system packages
       run: apt update && apt install -y python3.11 python3-pip
     - name: Setup python packages
@@ -150,7 +150,9 @@ jobs:
     - name: Apply migrations bundle
       run: tar xzf InForm.Migrations.tgz && ./InForm.Migrations
     - name: Start InForm.Server
-      run: dotnet run -c Release -v m --project InForm.Server &
+      run: dotnet run -c Release -v m --project InForm.Server -lp ci &
+    - name: Start InForm.Server
+      run: dotnet run -c Release -v m --project InForm.Web -lp ci &
     - name: Install system packages
       run: apt update && apt install -y openjdk-17-jdk curl
     - name: Install ZAP
@@ -164,7 +166,7 @@ jobs:
       uses: thollander/actions-comment-pull-request@v2
       with:
         comment_tag: zap-report
-        filePath: ci-utils/zap-report.md
+        filePath: /root/zap-report.md
 name: InForm CI
 on:
   pull_request:

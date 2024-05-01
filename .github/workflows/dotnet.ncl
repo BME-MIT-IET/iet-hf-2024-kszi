@@ -141,7 +141,8 @@ in
       ],
     zap-test = test_job
       [
-        run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Server &",
+        run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Server -lp ci &",
+        run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Web -lp ci &",
         run_step "Install system packages" "apt update && apt install -y openjdk-17-jdk curl",
         run_step "Install ZAP" m%"
           curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2.14.0_Linux.tar.gz | tar xz 
@@ -161,7 +162,7 @@ in
             && github.event_name == 'pull_request'
           "%,
           with = {
-            filePath = "ci-utils/zap-report.md",
+            filePath = "/root/zap-report.md",
             comment_tag = "zap-report"
           }
         },
@@ -194,7 +195,7 @@ in
       & runner_env,
     load-tests = test_job
       [
-        run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Server &",
+        run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Server -lp ci &",
         run_step "Install system packages" "apt update && apt install -y python3.11 python3-pip",
         run_step "Setup python packages" "python3.11 -m pip install -r requirements.txt --break-system-packages",
         run_step "Do load tests" m%"
