@@ -148,16 +148,17 @@ in
       [
         run_step "Tests" "dotnet test --no-build --verbosity normal"
       ],
-    zap-test = test_job 
+    zap-test = test_job
       [
         run_step "Start InForm.Server" "dotnet run -c Release -v m --project InForm.Server &",
-        {
-          name = "ZAP",
-          uses = "zaproxy/action-af@v0.1.0",
-          with = {
-            plan = "ci-utils/zap.yaml"
-          }
-        },
+        run_step "Install system packages" "apt update && apt install -y openjdk-17 curl",
+        run_step "Install ZAP" m%"
+          curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2.14.0_Linux.tar.gz | tar xz 
+        "%,
+        run_step "" m%"
+          cd ZAP_2.14.0
+          && ./zap.sh -cmd -autorun ../ci-utils/zap.yaml
+        "%,
         run_step "Stop server" "pkill -INT dotnet",
         {
           name = "Comment statistics to PR",
@@ -169,7 +170,7 @@ in
             && github.event_name == 'pull_request'
           "%,
           with = {
-            filePath = "zap-report.md",
+            filePath = "ci-utils/zap-report.md",
             comment_tag = "zap-report"
           }
         },

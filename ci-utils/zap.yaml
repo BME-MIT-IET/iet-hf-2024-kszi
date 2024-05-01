@@ -64,7 +64,7 @@ jobs:
   name: "activeScan"
 - parameters:
     template: "traditional-md"
-    reportDir: "/zap/wrk/"
+    reportDir: ""
     reportFile: "zap-report.md"
     reportTitle: "ZAP Scanning Report"
     reportDescription: ""

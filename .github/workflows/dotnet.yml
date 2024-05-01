@@ -151,10 +151,12 @@ jobs:
       run: tar xzf InForm.Migrations.tgz && ./InForm.Migrations
     - name: Start InForm.Server
       run: dotnet run -c Release -v m --project InForm.Server &
-    - name: ZAP
-      uses: zaproxy/action-af@v0.1.0
-      with:
-        plan: ci-utils/zap.yaml
+    - name: Install system packages
+      run: apt update && apt install -y openjdk-17 curl
+    - name: Install ZAP
+      run: 'curl -L https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2.14.0_Linux.tar.gz | tar xz '
+    - name: ''
+      run: cd ZAP_2.14.0 && ./zap.sh -cmd -autorun ../ci-utils/zap.yaml
     - name: Stop server
       run: pkill -INT dotnet
     - if: always() && github.event_name == 'pull_request'
@@ -162,7 +164,7 @@ jobs:
       uses: thollander/actions-comment-pull-request@v2
       with:
         comment_tag: zap-report
-        filePath: zap-report.md
+        filePath: ci-utils/zap-report.md
 name: InForm CI
 on:
   pull_request:
