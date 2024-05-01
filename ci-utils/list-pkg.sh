@@ -1,6 +1,8 @@
 ﻿#!/usr/bin/env sh
 
 type=$1
+# debug?
+dotnet list package "--$type" --format json --output-version 1
 
 dotnet list package "--$type" --format json --output-version 1 \
   | jq '(.projects | map({
