@@ -4,16 +4,17 @@ WORKDIR /app
 
 COPY . .
 
-RUN dotnet restore
+RUN dotnet restore "InForm.Web/InForm.Web.csproj"
 
-RUN dotnet publish  -c Release -o out
+RUN dotnet publish "InForm.Web/InForm.Web.csproj"  -c Release -o out
 
 
-ENTRYPOINT [ "bash" ]
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM nginx:alpine
 WORKDIR /app
-COPY --from=build-env /app/InForm.*/bin/Release .
-RUN ls
+EXPOSE 80
 
-# ENTRYPOINT ["dotnet", "InForm.Web.dll"]
+
+COPY --from=build-env /app/out/wwwroot /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
+
