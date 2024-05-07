@@ -3,13 +3,8 @@ WORKDIR /app
 
 COPY . ./
 
-
-
 RUN dotnet restore "InForm.Server/InForm.Server.csproj"
-
-
 RUN dotnet publish "InForm.Server/InForm.Server.csproj"  -c Release -o out
-
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app/InForm.Server
