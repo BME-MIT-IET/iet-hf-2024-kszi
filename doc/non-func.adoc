@@ -1,0 +1,75 @@
+= Nem funkcionális jellemzők
+:icons: font
+
+== Feladatkiíírás
+
+Nem-funkcionális jellemzők (teljesítmény, stresszteszt, biztonság, használhatóság...) vizsgálata (pl. JMeter, k6...)
+
+== Feladat
+
+A projekt nem-funkcionális jellemzőinek mérése; a backendre vonatkozó load-tesztek végrehajtása, illetve a komponensek biztonsági vizsgálata az elsődleges célja a feladatnak.
+Amennyiben lehetséges, ezek CI-ba való beépítése is megvalósítandó, az idő és a felhasznált technológiák korlátainak megfelelően.
+
+== Hibajegy
+
+https://github.com/BME-MIT-IET/iet-hf-2024-kszi/issues/6[#6]
+
+== Elvégzett munka & tapasztalatok
+
+A feladat megoldására több kisebb feladat került megvalósításra: a load-tesztek, amelyek a szerver terhelésbírását vizsgálják adott felhasználói kérés mellett; és a biztonságosságot vizsgáló automatikus eszközök bevezetése.
+Ezek mindegyike a CI pipelineba integrálásra került, így minden pull-request, a sztenderd tesztek helyessége mellett, ezeket a nem-funkcionális jellemzőket is megjeleníti/ellenőrzi.
+
+=== Terhelés tesztek
+
+A szerver kiszolgáló képessége a https://locust.io/[Locust] nevű eszközzel lett megmérve.
+Ezen eszközben egy Python script által leírt felhasználói kéréseket lehet automatikusan egy szerver/weboldal felé elküldeni megadott darabszámban.
+A lefutás során az eszköz gyűjti a válaszidőket és ezekből statisztikákat készít.
+A tesztelést a szerveroldal teljes felállításával valósítják meg a CI környezetben, a szükséges adatbázis felállításával együtt, így a lehető legközelebb állnak az adatok egy éles rendszerhez; főleg csak a hardver gyengébb.
+
+NOTE: Az alább részletezett CI rendszerben való futtatás mellett a megvalósítás manuális rendszerben való futtatást is lehetővé teszi, azonos eszközökkel.
+Ennek infrastruktúrális része nem olyan érdekes; egy parancsot kell kiadni, megvárni, míg lefut, és elkészül a generált CSV fájl, ami után már csak manuális elemzést kell végrehajtani.
+Esetlegesen a Locust grafikus felülete is igénybe vehető, ehhez meg kell nyitni a felajánlott URL-t a parancssorban.
+
+A teszteléshez használt fájl a `ci-utils/locust-file.py`, ez az, amivel magát a Locust-ot lehetséges konfigurálni.
+Ebben megadásra kerül, hogy az egyes formok készítésekor és kitöltésekor milyen adatokat küldjön a szervernek.
+Ennek a lefutásával egy CSV fájl keletkezik a gyűjtött statisztikákkal.
+Mivel ez nagyon sok adatot tartalmaz, így egy segédscript (a `ci-utils\parse-locust.py`) egy ember által könyebben olvasható táblázatot készít a fontosabb oszlopokból, amit a rendszer a pull requestre el is küld kommentként.
+
+.Tapasztalatok
+A szerver (bár nem rendelkezik nagyon komplex/számítás igényes logikával), nyugodtan képes ~720 kérés/s-es terhelést kezelni, 3000 konkurrens felhasználó mellett, még a CI környezetben biztosított virtualizált hardveren, úgy, hogy a kérések készítése is azt az adott CPU magot terhelte, ahol a szerver futott.
+Ez, az eredetileg becsült, 500 kérés/s-es eredményeket, amit a CI környezet is ellenőriz, felülmúlta.
+
+Ennek ellenére a 99. percentilis jelentősen rosszabb az átlagnál, főleg a formok létrehozásánál, ahol már az átlagos válaszidő is ~2 szerese a többinek.
+Ezeket az adatokat azonban a CI rendszer által biztosított vas képessegének határainak vélem betudni.
+
+=== Biztonság
+
+A biztonságosság ellenőrzése egy komplex feladat, amit automatikus eszközökkel csak véges mértékig lehet megvalósítani; mégis ezt próbáltuk megvalósítani, hogy az szerver biztonságossága a legalapvetőbb hibákat elkerülhesse.
+Ennek a célnak az eléréséhez két megközelítés került megvalósításra: a felhasznált csomagok ellenőrzése a NuGet adatbázisban esetleges sérülékenységek észrevételére, és a OWASP által készített Zed Attack Proxy eszköz észrevételeiből készített biztonságossági jelentéssel.
+
+==== Supply chain
+
+A projekt által használt csomagok biztonságossága befolyásolja a projekt biztonságosságát, így ezek ellenőrzése az egyik legfontosabb és legegyszerűbben automatizálható ellenőrzések közé tartozik.
+
+A megoldás egy megfelelően felparaméterezett parancs a `dotnet` eszköz felé, amely a NuGet csomagkezelő adatbázisában megkeresi az esetleges sérülékenységeket és újabb verziókat.
+Az így kapott JSON kimenetet egy jq programmal átalakítva, beadhatunk egy Python segédszrkiptnek (`ci-utils\parse-pkgs.py`), ami egy könnyen olvasható Markdown jelentést generál a csomagok állapotáról.
+A generált fájl itt is az előídéző pull-requestre üzenetként kerül elküldésre.
+
+.Tapasztalat
+A használt csomagokban nincs sérülékenység, de nem a legfrissebbek.
+Ez könnyű lesz majd javítani a tárgy keretein kívül.
+
+==== ZAP
+
+Az OWASP által fejlesztett ZAP egy komplex weboldalak penetráció tesztelésre készített szoftvere.
+A képességeinek csak töredékét használjuk jelenleg ki, de a legfontosabb hibákat így is képesek vagyunk elkapni.
+Ehhez a ZAP Automation Framework rendszerét használjuk, ahol egy YAML fájlban megadhatóak azok a lépések, amelyeken keresztül a ZAP a támadási próbálkozásokat végrehajtja.
+A fájl megtalálható a tárolóban (`ci-utils\zap.yaml`), amit a CI rendszer is lefuttat.
+Az így generált markdown jelentés, a többi lépéshez hasonlóan, a pull requestre kerül kommentelésre.
+
+.Tapasztalat
+Az eszköz talált pár figyelmeztetést, azonban semmi nagyon feltűnően hibás megvalósítást nem tartalmaz a rendszer.
+Ez valamilyen szinten várható, hiszen alapvetően nem egy komplex rendszerről van szó, így nem is nagy az attack vector.
+Ezek javítása szintén nem lesz komplex feladat.
+
+Érdekes lehet megnézni aggresszívabb támadási próbálkozásokat.
