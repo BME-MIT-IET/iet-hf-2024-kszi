@@ -5,6 +5,9 @@ Deployment segítése (Docker, Vagrant, felhő szolgáltatásba telepítés, ha 
 Az alkalmazás két komponensből áll: az InForm.Server a backend szerverkét szolgáló ASP.NET projekt, ami a felhasznált REST API-t biztosítja; és az InForm.Web, ami a webes frontend, Blazor WASM projektként megvalósítva. Ezek külön telepíthetőek, egyszerűen egy konfiguráció beállítása kapcsolja az egyiket a másikhoz.
 A feladat ezeknek a komponenseknek a docker konténerekbe csomagolása.
 
+## hibajegy:
+https://github.com/BME-MIT-IET/iet-hf-2024-kszi/issues/4[#4]
+
 # Megvalósítás:
 A feladatot 2 részre szettem szét. Az első rész a `server.dockerfile`.
 
@@ -27,3 +30,6 @@ Használata a szerveréhez nagyon hasonló, a  `docker build -f client.Dockerfil
 
 ### működés:
 A buildelés része egy az egyben megegyezik a `server.dockerfile` esetével. Azt követően egy nginx környezetet includolok be, megnyitom a 80as portot, majd a `/usr/share/nginx/html` mappába átmásolom a lebuildelt balzor projekt wwwroot mappáját. Ahhoz hogy a webserver megfelelően működjön be kell konfigurálni. Ehhez létrehoztam egy `nginx.conf` file-t ami a szerver konfigurációját tartalmazza. Ebben megadtam, hogy a 80as porton jelenítse meg a `/usr/share/nginx/html` tartalmát. Ezt átmásolom a konténerbe
+
+## Eredmények
+A docker rendkívül hasznos és jó koncepció, azonban rengeteg bonyolutságot visz az elkészítése egy hozzá nem értő számára a projektbe és rendkívül nehéz debuggolni. Ezen belül mind a build mind a run részénél adódhatnak olyna hibák, melyek kiszűrése nehézkes mivel nem elég visszajelzést. Ennek ellenére, hogy már vannak kész dockerfileok a deployolás nagyban leegyszerűsödik hosszútávon.
