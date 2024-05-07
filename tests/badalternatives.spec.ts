@@ -139,7 +139,7 @@ test('delete element', async ({ page }) => {
   await expect(page.locator('form')).toContainText('At least one form element is required');
 });
 
-//creates a multi-choice test and sets the maximum selectable field 1, then tries to select multipole
+//creates a multi-choice test and sets the maximum selectable field 1, then tries to select multiple
 test('multi option 1 select', async ({ page }) => {
   await page.goto('https://localhost:7211/');
   await page.getByRole('link', { name: 'Create' }).click();

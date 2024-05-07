@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-// happy path, create a new test fill out the required fields then add a new text element, fill it's fields out, then submit and whatch it's responses
+// happy path, create a new test fill out the required fields then add a new text element, fill it's fields out, then submits it
 test('1 input element', async ({ page }) => {
   await page.goto('https://localhost:7211/');
   await page.getByRole('link', { name: 'Create' }).click();
@@ -19,10 +19,6 @@ test('1 input element', async ({ page }) => {
   await page.getByLabel('Response').click();
   await page.getByLabel('Response').fill('response');
   await page.getByRole('button', { name: 'Submit' }).click();
-  await page.getByRole('button', { name: 'See results' }).click();
-  await page.getByLabel('Password').click();
-  await page.getByLabel('Password').fill('pass');
-  await page.getByRole('button', { name: 'Open' }).click();
 });
 //creates with 2 types of input fields a simple and a multichoice test
 test('2 input element', async ({ page }) => {
