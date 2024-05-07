@@ -163,6 +163,8 @@ test('multi option 1 select', async ({ page }) => {
   await page.locator('#mc_elem_subtitle').fill('subtitle');
   await page.getByLabel('Maximum selectable').click();
   await page.getByLabel('Maximum selectable').fill('1');
+  await page.getByText('Add option').click();
+  await page.getByText('Add option').click();
   await page.getByLabel('Option 0').click();
   await page.getByLabel('Option 0').fill('opt1');
   await page.getByLabel('Option 1').click();
@@ -172,3 +174,84 @@ test('multi option 1 select', async ({ page }) => {
   await page.getByLabel('opt2').check();
   await expect(page.getByLabel('opt1')).not.toBeChecked();
 });
+
+//create a test then trying to check answers with wrong answer
+test('wrong password', async ({ page }) => {
+  await page.goto('https://localhost:7211/');
+  await page.getByRole('link', { name: 'Create' }).click();
+  await page.getByLabel('Form Title').click();
+  await page.getByLabel('Form Title').fill('title');
+  await page.getByLabel('Form Subtitle').click();
+  await page.getByLabel('Form Subtitle').fill('subtitle');
+  await page.getByLabel('Results password').click();
+  await page.getByLabel('Results password').fill('password');
+  await page.getByText('Add element').click();
+  await page.getByRole('button', { name: 'Text element' }).click();
+  await page.getByLabel('Title', { exact: true }).click();
+  await page.getByLabel('Title', { exact: true }).fill('title');
+  await page.getByLabel('Subtitle', { exact: true }).click();
+  await page.getByLabel('Subtitle', { exact: true }).fill('subtitle');
+  await page.getByRole('button', { name: 'Publish' }).click();
+  await page.getByLabel('Response').click();
+  await page.getByLabel('Response').fill('response');
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await page.getByRole('button', { name: 'See results' }).click();
+  await page.getByLabel('Password').click();
+  await page.getByLabel('Password').fill('pass');
+  await page.getByRole('button', { name: 'Open' }).click();
+  await expect(page.locator('form')).toContainText('Incorrect password.');
+});
+
+
+//fill required is enabled, however user did not filled out
+test('fill required', async ({ page }) => {
+  await page.goto('https://localhost:7211/');
+  await page.getByRole('link', { name: 'Create' }).click();
+  await page.getByText('Add element').click();
+  await page.getByRole('button', { name: 'Text element' }).click();
+  await page.getByLabel('Form Title').click();
+  await page.getByLabel('Form Title').fill('title');
+  await page.getByLabel('Form Subtitle').click();
+  await page.getByLabel('Form Subtitle').fill('subtitle');
+  await page.getByLabel('Results password').click();
+  await page.getByLabel('Results password').fill('pass');
+  await page.getByLabel('Title', { exact: true }).click();
+  await page.getByLabel('Title', { exact: true }).fill('title');
+  await page.getByLabel('Subtitle', { exact: true }).click();
+  await page.getByLabel('Subtitle', { exact: true }).fill('subtitle');
+  await page.getByLabel('Fill required').check();
+  await page.getByRole('button', { name: 'Publish' }).click();
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await expect(page.locator('form')).toContainText('This field is required');
+});
+
+//check required field at multi-choice
+test('required multi-choice', async ({ page }) => {
+  await page.goto('https://localhost:7211/');
+  await page.getByRole('link', { name: 'Create' }).click();
+  await page.getByLabel('Form Title').click();
+  await page.getByLabel('Form Title').fill('title');
+  await page.getByLabel('Form Subtitle').click();
+  await page.getByLabel('Form Subtitle').fill('subtitle');
+  await page.getByLabel('Results password').click();
+  await page.getByLabel('Results password').fill('pass');
+  await page.getByText('Add element').click();
+  await page.getByRole('button', { name: 'Multi-choice element' }).click();
+  await page.getByLabel('Fill required').check();
+  await page.getByLabel('Title', { exact: true }).click();
+  await page.getByLabel('Title', { exact: true }).fill('title');
+  await page.getByLabel('Subtitle', { exact: true }).click();
+  await page.getByLabel('Subtitle', { exact: true }).fill('subtitle');
+  await page.getByRole('button', { name: 'Add option' }).click();
+  await page.getByRole('button').nth(4).click();
+  await page.getByLabel('Option 0').click();
+  await page.getByLabel('Option 0').fill('opt1');
+  await page.getByLabel('Option 1').click();
+  await page.getByLabel('Option 1').fill('opt2');
+  await page.getByLabel('Maximum selectable').click();
+  await page.getByLabel('Maximum selectable').fill('1');
+  await page.getByRole('button', { name: 'Publish' }).click();
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await expect(page.locator('form')).toContainText('This field is required');
+});
+
