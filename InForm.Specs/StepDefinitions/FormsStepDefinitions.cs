@@ -43,7 +43,7 @@ namespace InForm.Specs.StepDefinitions
         private ActionResult<GetFormReponse> getFormResponse;
         private ActionResult<GetFormNameResponse> getFormNameResponse;
 
-        private readonly Guid testGuid = new Guid("C56A4180-65AA-42EC-A945-5FD21DEC0538");
+        private readonly Guid testGuid = Guid.NewGuid();
         private Guid formGuid;
 
         private CreateFormRequest makeCreateFormRequest(string title,string subtitle,string elementTitle, string elementSubtitle, bool required, bool multiline, int elementMaxLength)
