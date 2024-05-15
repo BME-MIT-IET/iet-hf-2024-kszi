@@ -14,7 +14,7 @@ Scenario: Getting an existing form
 Scenario: Getting a non-existing form
 	Given A form does not exist with the guid
 	When I request the form with the guid
-	Then I should get a 404 response
+	Then I should get a NotFound response
 
 @existingformsname
 Scenario: Getting an existing form's name
@@ -26,7 +26,7 @@ Scenario: Getting an existing form's name
 Scenario: Getting nonextistant form's name
 	Given A form does not exist with the guid
 	When the client requests the form's name with guid
-	Then I should get a 404 response
+	Then I should get a NotFound response
 
 @creatingform
 Scenario: Creating a form

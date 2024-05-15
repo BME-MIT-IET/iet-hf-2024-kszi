@@ -63,7 +63,7 @@ public partial class InFormDbContext {
     /// <summary>
     ///     The db set for the form entities.
     /// </summary>
-    public DbSet<Form> Forms { get; set; }
+    public virtual DbSet<Form> Forms { get; set; }
 
     /// <summary>
     ///     The db set for the base form element entities.

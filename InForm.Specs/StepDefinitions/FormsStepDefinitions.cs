@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using EntityFrameworkCoreMock;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace InForm.Specs.StepDefinitions
 {
@@ -23,7 +24,7 @@ namespace InForm.Specs.StepDefinitions
             var passwordHasher = new Mock<IPasswordHasher>();
             passwordHasher.Setup(x => x.Hash(It.IsAny<string>())).Returns("hash");
             passwordHasher.Setup(x => x.VerifyAndUpdate(It.IsAny<string>(), It.IsAny<string>())).Returns(new HashVerificationResult(true,"hash"));
-            var context = new DbContextMock<InFormDbContext>(options);
+            context = new DbContextMock<InFormDbContext>(options);
             context.CreateDbSetMock(x => x.Forms, new[]
             {
                 new Form { Id = 1, Title = "test", Subtitle = "test" }
@@ -33,12 +34,14 @@ namespace InForm.Specs.StepDefinitions
 
         }
 
+        DbContextMock<InFormDbContext> context;
         private FormsController formsController;
 
         private CreateFormRequest formRequest;
 
         private ActionResult<CreateFormResponse> createFormResponse;
         private ActionResult<GetFormReponse> getFormResponse;
+        private ActionResult<GetFormNameResponse> getFormNameResponse;
 
         private Guid formGuid;
 
@@ -82,25 +85,25 @@ namespace InForm.Specs.StepDefinitions
         [Given(@"A form does not exist with the guid")]
         public void GivenAFormDoesNotExistWithTheGuid()
         {
-            throw new PendingStepException();
+            formGuid = Guid.NewGuid();
         }
 
         [When(@"I request the form with the guid")]
-        public void WhenIRequestTheFormWithTheGuid()
+        public async void WhenIRequestTheFormWithTheGuid()
         {
-            throw new PendingStepException();
+            getFormResponse = await formsController.GetForm(formGuid);
         }
 
-        [Then(@"I should get a (.*) response")]
-        public void ThenIShouldGetAResponse(int p0)
+        [Then(@"I should get a NotFound response")]
+        public void ThenIShouldGetAResponse()
         {
-            throw new PendingStepException();
+            getFormResponse.Result.Should().BeOfType<NotFoundResult>();
         }
 
         [When(@"the client requests the form's name with guid")]
-        public void WhenTheClientRequestsTheFormsNameWithGuid()
+        public async void WhenTheClientRequestsTheFormsNameWithGuid()
         {
-            throw new PendingStepException();
+            getFormNameResponse = await formsController.GetFormName(formGuid);
         }
 
         [Then(@"the client receives the form's name with guid")]
@@ -130,11 +133,8 @@ namespace InForm.Specs.StepDefinitions
         [Then(@"I should get a CreatedStatusCode and form should have a guid")]
         public void IshouldgetaCreatedStatusCodeandformshouldhaveaguid()
         {
-            var result = createFormResponse;
-            //Assert.True(result is CreatedResult);
-            //var response = createFormResponse.Value;
-            //response.Should().NotBeNull();
-            //Assert.True(response.Id != Guid.Empty);
+            var response = createFormResponse.Value;
+            response.Should().NotBeNull();
         }
 
 
