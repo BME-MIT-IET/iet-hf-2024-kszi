@@ -27,7 +27,7 @@ namespace InForm.Specs.StepDefinitions
             context = new DbContextMock<InFormDbContext>(options);
             context.CreateDbSetMock(x => x.Forms, new[]
             {
-                new Form { Id = 1, Title = "test", Subtitle = "test" }
+                new Form { Id = 1,IdGuid = testGuid, Title = "test", Subtitle = "test" }
             });
 
             formsController = new FormsController(formsService: new FormsService(), passwordHasher: passwordHasher.Object, dbContext: context.Object, logger: new LoggerFactory().CreateLogger<FormsController>());
@@ -43,6 +43,7 @@ namespace InForm.Specs.StepDefinitions
         private ActionResult<GetFormReponse> getFormResponse;
         private ActionResult<GetFormNameResponse> getFormNameResponse;
 
+        private readonly Guid testGuid = new Guid("C56A4180-65AA-42EC-A945-5FD21DEC0538");
         private Guid formGuid;
 
         private CreateFormRequest makeCreateFormRequest(string title,string subtitle,string elementTitle, string elementSubtitle, bool required, bool multiline, int elementMaxLength)
@@ -62,17 +63,15 @@ namespace InForm.Specs.StepDefinitions
 
 
         [Given(@"the form with guid")]
-        public async void GivenTheFormWithGuid()
+        public void GivenTheFormWithGuid()
         {
-            formRequest = makeCreateFormRequest("test", "test", "test", "test", true,true,50);
-            var result = await formsController.CreateForm(formRequest);
-            formGuid = result.Value.Id;
+            formGuid = testGuid;
         }
 
         [When(@"the client requests the form with guid")]
-        public async void WhenTheClientRequestsTheFormWithGuid()
+        public void WhenTheClientRequestsTheFormWithGuid()
         {
-            getFormResponse =  await formsController.GetForm(formGuid);
+            getFormResponse =  formsController.GetForm(formGuid).Result;
         }
 
         [Then(@"the client receives the form with guid")]
@@ -89,9 +88,9 @@ namespace InForm.Specs.StepDefinitions
         }
 
         [When(@"I request the form with the guid")]
-        public async void WhenIRequestTheFormWithTheGuid()
+        public void WhenIRequestTheFormWithTheGuid()
         {
-            getFormResponse = await formsController.GetForm(formGuid);
+            getFormResponse = formsController.GetForm(formGuid).Result;
         }
 
         [Then(@"I should get a NotFound response")]
@@ -100,16 +99,23 @@ namespace InForm.Specs.StepDefinitions
             getFormResponse.Result.Should().BeOfType<NotFoundResult>();
         }
 
-        [When(@"the client requests the form's name with guid")]
-        public async void WhenTheClientRequestsTheFormsNameWithGuid()
+        [Then(@"I should get a NotFound response for formname")]
+        public void ThenIShouldGetAResponseforformname()
         {
-            getFormNameResponse = await formsController.GetFormName(formGuid);
+            getFormNameResponse.Result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [When(@"the client requests the form's name with guid")]
+        public void WhenTheClientRequestsTheFormsNameWithGuid()
+        {
+            getFormNameResponse = formsController.GetFormName(formGuid).Result;
         }
 
         [Then(@"the client receives the form's name with guid")]
         public void ThenTheClientReceivesTheFormsNameWithGuid()
         {
-            throw new PendingStepException();
+            getFormNameResponse.Should().NotBeNull();
+            getFormNameResponse.Value.Id.Should().Be(formGuid);
         }
 
 
@@ -124,15 +130,16 @@ namespace InForm.Specs.StepDefinitions
         }
 
         [When(@"I create the form")]
-        public async void WhenICreateTheForm()
+        public  void WhenICreateTheForm()
         {
-            var result = await formsController.CreateForm(formRequest);
+            var result =  formsController.CreateForm(formRequest).Result;
             createFormResponse = result;
         }
 
         [Then(@"I should get a CreatedStatusCode and form should have a guid")]
         public void IshouldgetaCreatedStatusCodeandformshouldhaveaguid()
         {
+            createFormResponse.Result.Should().BeOfType<CreatedAtActionResult>();
             var response = createFormResponse.Value;
             response.Should().NotBeNull();
         }

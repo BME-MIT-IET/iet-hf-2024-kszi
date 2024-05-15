@@ -246,7 +246,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.When("the client requests the form\'s name with guid", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 29
- testRunner.Then("I should get a NotFound response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should get a NotFound response for formname", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

@@ -26,7 +26,7 @@ Scenario: Getting an existing form's name
 Scenario: Getting nonextistant form's name
 	Given A form does not exist with the guid
 	When the client requests the form's name with guid
-	Then I should get a NotFound response
+	Then I should get a NotFound response for formname
 
 @creatingform
 Scenario: Creating a form
@@ -36,6 +36,3 @@ Scenario: Creating a form
 	When I create the form
 	Then I should get a CreatedStatusCode and form should have a guid
 
-
-#private CreateFormRequest makeCreateFormRequest(string title,string subtitle,string elementTitle
-#												string elementSubtitle, bool required, bool multiline, int elementMaxLength)
