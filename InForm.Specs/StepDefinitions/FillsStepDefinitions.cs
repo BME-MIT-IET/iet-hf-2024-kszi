@@ -3,6 +3,7 @@ using InForm.Server.Core.Features.Fill;
 using InForm.Server.Db;
 using InForm.Server.Features.Common;
 using InForm.Server.Features.FillForms;
+using InForm.Server.Features.FillForms.Db;
 using InForm.Server.Features.FillForms.Service;
 using InForm.Server.Features.Forms.Db;
 using Microsoft.AspNetCore.Identity;
@@ -27,8 +28,16 @@ namespace InForm.Specs.StepDefinitions
                 new Form { Id = 1, IdGuid = testGuid, Title = "test", Subtitle = "test", PasswordHash = "test" ,FormElementBases = 
                     { new StringFormElement {Title = "test", Id = 1 ,ParentFormId = 1, Subtitle = "test"} } }
             });
+            context.CreateDbSetMock(x => x.StringFormElements, new[]
+            {
+                new StringFormElement {Title = "test", Id = 1 ,ParentFormId = 1, Subtitle = "test"}
+            });
+            context.CreateDbSetMock(x => x.MultiChoiceFormElements);
+
+            
             pwhasher = new Mock<IPasswordHasher>();
             pwhasher.Setup(x => x.Hash(It.IsAny<string>())).Returns(It.IsAny<string>);
+            pwhasher.Setup(x => x.VerifyAndUpdate(It.Is<string>(x => x.Contains("test")), It.IsAny<string>())).Returns(new HashVerificationResult(true,null));
             fillsController = new FillsController(dbContext: context.Object, fillService: new FillService(pwhasher.Object));
         }
 

@@ -68,20 +68,20 @@ public partial class InFormDbContext {
     /// <summary>
     ///     The db set for the base form element entities.
     /// </summary>
-    public DbSet<FormElementBase> FormElementBases { get; set; }
+    public virtual DbSet<FormElementBase> FormElementBases { get; set; }
 
     /// <summary>
     ///     The db set for the string form element entities.
     /// </summary>
-    public DbSet<StringFormElement> StringFormElements { get; set; }
+    public virtual DbSet<StringFormElement> StringFormElements { get; set; }
 
     /// <summary>
     ///     The db set for the multi-choice form element entities.
     /// </summary>
-    public DbSet<MultiChoiceFormElement> MultiChoiceFormElements { get; set; }
+    public virtual DbSet<MultiChoiceFormElement> MultiChoiceFormElements { get; set; }
 
     /// <summary>
     ///     The db set for the multi-choice option entities.
     /// </summary>
-    public DbSet<MultiChoiceOption> MultiChoiceOptions { get; set; }
+    public virtual DbSet<MultiChoiceOption> MultiChoiceOptions { get; set; }
 }
