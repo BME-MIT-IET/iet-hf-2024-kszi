@@ -20,6 +20,7 @@ namespace InForm.Specs.StepDefinitions
     {
         public FormsStepDefinitions()
         {
+            testGuid = Guid.NewGuid();
             var options = new DbContextOptions<InFormDbContext>();
             var passwordHasher = new Mock<IPasswordHasher>();
             passwordHasher.Setup(x => x.Hash(It.IsAny<string>())).Returns("hash");
@@ -43,7 +44,7 @@ namespace InForm.Specs.StepDefinitions
         private ActionResult<GetFormReponse> getFormResponse;
         private ActionResult<GetFormNameResponse> getFormNameResponse;
 
-        private readonly Guid testGuid = Guid.NewGuid();
+        private readonly Guid testGuid;
         private Guid formGuid;
 
         private CreateFormRequest makeCreateFormRequest(string title,string subtitle,string elementTitle, string elementSubtitle, bool required, bool multiline, int elementMaxLength)

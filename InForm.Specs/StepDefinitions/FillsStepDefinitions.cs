@@ -21,6 +21,7 @@ namespace InForm.Specs.StepDefinitions
         
         public FillsStepDefinitions()
         {
+            testGuid = Guid.NewGuid();
             var options = new DbContextOptions<InFormDbContext>();
             context = new DbContextMock<InFormDbContext>(options);
             context.CreateDbSetMock(x => x.Forms, new[]
@@ -41,7 +42,7 @@ namespace InForm.Specs.StepDefinitions
             fillsController = new FillsController(dbContext: context.Object, fillService: new FillService(pwhasher.Object));
         }
 
-        private readonly Guid testGuid = Guid.NewGuid();
+        private readonly Guid testGuid;
         private Guid formGuid;
 
         DbContextMock<InFormDbContext> context;

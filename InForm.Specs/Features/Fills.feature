@@ -1,6 +1,6 @@
 ﻿Feature: Fills
 
-A short summary of the feature
+A feature that has scenarios that test the API endpoints provided by the FillsController
 
 @acceptedPostFillData
 Scenario: Tries adding data that is accepted by the controller

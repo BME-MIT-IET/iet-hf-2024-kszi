@@ -1,8 +1,6 @@
 ﻿Feature: Forms
 
-A short summary of the feature
-
-
+A feature that has scenarios that test the API endpoints provided by the FormsController 
 
 @existingform
 Scenario: Getting an existing form
