@@ -24,7 +24,7 @@ jobs:
           jmeter -n -t non-functional-test/terheleses_teszt.jmx -l non-functional-test/Eredmenyek/results.jtl
 
       - name: Upload JMeter results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: jmeter-results
           path: non-functional-test/Eredmenyek/results.jtl
