@@ -1,12 +1,6 @@
 name: JMeter Tests
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
   jmeter-tests:
@@ -14,7 +8,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
 
       - name: Install JMeter
         run: sudo apt-get update && sudo apt-get install -y jmeter
@@ -23,8 +22,21 @@ jobs:
         run: |
           jmeter -n -t non-functional-test/terheleses_teszt.jmx -l non-functional-test/Eredmenyek/results.jtl
 
+      - name: Check JMeter results
+        run: |
+          cat non-functional-test/Eredmenyek/results.jtl
+
+      - name: Generate JMeter HTML report
+        run: jmeter -g results/results.jtl -o results/report
+
       - name: Upload JMeter results
         uses: actions/upload-artifact@v4
         with:
           name: jmeter-results
           path: non-functional-test/Eredmenyek/results.jtl
+
+      - name: Upload JMeter HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jmeter-html-report
+          path: results/report
