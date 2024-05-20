@@ -22,20 +22,20 @@ public partial class InFormDbContext {
     /// <summary>
     ///     The db set for bare fill data entities.
     /// </summary>
-    public DbSet<FillData> FillData { get; set; }
+    public virtual DbSet<FillData> FillData { get; set; }
 
     /// <summary>
     ///     The db set for the string fill data entities.
     /// </summary>
-    public DbSet<StringFillData> StringFillData { get; set; }
+    public virtual DbSet<StringFillData> StringFillData { get; set; }
 
     /// <summary>
     ///     The db set for the multi choice data entities.
     /// </summary>
-    public DbSet<MultiChoiceFillData> MultiChoiceFillDatas { get; set; }
+    public virtual DbSet<MultiChoiceFillData> MultiChoiceFillDatas { get; set; }
 
     /// <summary>
     ///     The db set for the multi choice fill selection entities.
     /// </summary>
-    public DbSet<MultiChoiceFillSelection> MultiChoiceFillSelections { get; set; }
+    public virtual DbSet<MultiChoiceFillSelection> MultiChoiceFillSelections { get; set; }
 }
