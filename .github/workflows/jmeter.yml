@@ -28,7 +28,7 @@ jobs:
           cat non-functional-test/Eredmenyek/results.jtl
 
       - name: Generate JMeter HTML report
-        run: jmeter -g results/results.jtl -o results/report
+        run: jmeter -g non-functional-test/Eredmenyek/results.jtl -o non-functional-test/Report
 
       - name: Upload JMeter results
         uses: actions/upload-artifact@v4
@@ -40,4 +40,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jmeter-html-report
-          path: results/report
+          path: non-functional-test/Report
